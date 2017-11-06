@@ -1,0 +1,26 @@
+checks:
+    python:
+        code_rating: true
+        duplicate_code: true
+tools:
+    pylint:
+        python_version: '3'
+filter:
+    excluded_paths:
+        - '*/tests/*'
+        - '*/migrations/*'
+build:
+    environment:
+        python: '3.5.1'
+        variables:
+            DJANGO_SETTINGS_MODULES: settings
+#            DATABASE_URL: postgres://scrutinizer:scrutinizer@localhost:5434/localized_fields
+#       postgresql: true
+
+    dependencies:
+        override:
+            - 'pip install -r requirements.txt'
+            - 'pip install pycodestyle'
+    tests:
+        override:
+            - command: pycodestyle ./posos/app

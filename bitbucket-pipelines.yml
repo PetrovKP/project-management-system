@@ -1,0 +1,11 @@
+image: python:3.5.1
+pipelines:
+  default:
+    - step:
+        script:
+          - pip install -r requirements.txt
+          - pip install codecov
+          - cd posos
+          - python manage.py test app
+          - coverage run manage.py test app
+          - codecov --token 72870f79-c051-442c-8e4c-355dad2cef29
