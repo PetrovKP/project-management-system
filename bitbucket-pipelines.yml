@@ -1,7 +1,10 @@
 image: python:3.5.1
 pipelines:
   default:
-    - step: co
+    - step:
         script:
           - pip install -r requirements.txt
           - python manage.py test
+
+
+
