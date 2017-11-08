@@ -1,0 +1,9 @@
+{% block content %}
+<body>
+<div>
+    {% for project in projects %}
+    <p>{{project.title}}</p>
+    {% endfor %}
+</div>
+</body>
+{% endblock %}
