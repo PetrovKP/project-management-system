@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
-from .models import Project, Ticket
+from .models import Project, Ticket, TicketStatus
 
 
 class AccessToProjectMixin(LoginRequiredMixin):
@@ -28,7 +28,6 @@ class ProjectView(AccessToProjectMixin, TemplateView):
         project_id = kwargs['project_id']
         context = super(ProjectView, self).get_context_data()
         context['project'] = Project.objects.get(id=project_id)
-        context['open_tickets'] = Ticket.objects.get_open_tickets(project_id)
-        context['in_progress_tickets'] = Ticket.objects.get_in_progress_tickets(project_id)
-        context['done_tickets'] = Ticket.objects.get_done_tickets(project_id)
+        context['tickets'] = Ticket.objects.filter(project__id=project_id)
+        context['status_list'] = TicketStatus.objects.all()
         return context

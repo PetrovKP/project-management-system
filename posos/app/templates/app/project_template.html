@@ -5,25 +5,17 @@
     <p>{{project.id}}</p>
     <p>{{project.title}}</p>
     <p>{{project.description}}</p>
+    {% for status in status_list %}
+        <br>
+        <h4>{{status}}</h4>
+        {% for ticket in tickets %}
+            {% if ticket.status == status %}
+            <p>{{ticket.title}}</p>
+            {% endif %}
+        {% endfor %}
+        <hr width="500" size="2" color="#ff0000" />
 
-    <p>Не назначенные тикеты</p>
-    {% for ticket in open_tickets %}
-    <p>{{ticket.title}}</p>
     {% endfor %}
-    <hr width="500" size="2" color="#ff0000" />
-
-    <p>Назначенные тикеты</p>
-    {% for ticket in in_progress_tickets %}
-    <p>{{ticket.title}}</p>
-    {% endfor %}
-    <hr  width="500" size="2" color="#ff0000" />
-
-    <p>Закрытые тикеты</p>
-    {% for ticket in done_tickets %}
-    <p>{{ticket.title}}</p>
-    {% endfor %}
-    <hr width="500" size="2" color="#ff0000" />
-
     <p>Девелоперы</p>
     {% for developer in project.developers.all %}
     <p>{{developer.username}}</p>
