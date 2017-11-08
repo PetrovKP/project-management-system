@@ -15,21 +15,6 @@ class ProjectManager(models.Manager):
         return user in project.manager.all() or user in project.developers.all()
 
 
-class TicketManager(models.Manager):
-
-    @staticmethod
-    def get_open_tickets(project_id):
-        return Ticket.objects.filter(project_id=project_id, status=TicketStatus.objects.get(title="Open"))
-
-    @staticmethod
-    def get_in_progress_tickets(project_id):
-        return Ticket.objects.filter(project_id=project_id, status=TicketStatus.objects.get(title="In progress"))
-
-    @staticmethod
-    def get_done_tickets(project_id):
-        return Ticket.objects.filter(project_id=project_id, status=TicketStatus.objects.get(title="Done"))
-
-
 class TicketStatus(models.Model):
     title = models.CharField(max_length=20)
 
@@ -64,14 +49,21 @@ class Ticket(models.Model):
     description = models.TextField()
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     assignee = models.ForeignKey(User, related_name='assignee')
-    reporter = models.ForeignKey(User, related_name='reporter')
+    reporter = models.ForeignKey(User, related_name='reporter', blank=True, null=True)
     status = models.ForeignKey(TicketStatus, on_delete=models.PROTECT)
     created_date = models.DateField(auto_now_add=True)
     due_date = models.DateField()
     time_estimated = models.IntegerField() #probably change to float
-    time_remaining = models.IntegerField() #do not forget to decrement after logged time added
-    time_logged = models.IntegerField()
+    time_remaining = models.IntegerField(blank=True) #do not forget to decrement after logged time added
+    time_logged = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
 
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None, *args, **kwargs):
+        if self.status is None:
+            self.status = TicketStatus.objects.get(title="Open")
+        if self.time_remaining is None:
+            self.time_remaining = self.time_estimated
+        super(Ticket, self).save(*args, **kwargs)
