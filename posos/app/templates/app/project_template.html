@@ -5,12 +5,13 @@
     <p>{{project.id}}</p>
     <p>{{project.title}}</p>
     <p>{{project.description}}</p>
+
     {% for status in status_list %}
         <br>
         <h4>{{status}}</h4>
         {% for ticket in tickets %}
             {% if ticket.status == status %}
-            <p>{{ticket.title}}</p>
+            <a href="{% url 'ticket' project_id=project.id ticket_id=ticket.id %}">{{ticket.title}}</a>
             {% endif %}
         {% endfor %}
         <hr width="500" size="2" color="#ff0000" />

@@ -25,9 +25,19 @@ class ProjectView(AccessToProjectMixin, TemplateView):
     template_name = "app/project_template.html"
 
     def get_context_data(self, **kwargs):
-        project_id = kwargs['project_id']
         context = super(ProjectView, self).get_context_data()
+        project_id = kwargs['project_id']
         context['project'] = Project.objects.get(id=project_id)
         context['tickets'] = Ticket.objects.filter(project__id=project_id)
         context['status_list'] = TicketStatus.objects.all()
+        return context
+
+
+class TicketView(AccessToProjectMixin, TemplateView):
+    template_name = "app/ticket_template.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(TicketView, self).get_context_data()
+        ticket_id = kwargs['ticket_id']
+        context['ticket'] = Ticket.objects.get(id=ticket_id)
         return context
