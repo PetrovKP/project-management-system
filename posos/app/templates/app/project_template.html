@@ -1,0 +1,25 @@
+
+<body>
+<div align="center">
+    <p align="left">Дезигн</p>
+    <p>{{project.id}}</p>
+    <p>{{project.title}}</p>
+    <p>{{project.description}}</p>
+
+    {% for status in status_list %}
+        <br>
+        <h4>{{status}}</h4>
+        {% for ticket in tickets %}
+            {% if ticket.status == status %}
+            <a href="{% url 'ticket' project_id=project.id ticket_id=ticket.id %}">{{ticket.title}}</a>
+            {% endif %}
+        {% endfor %}
+        <hr width="500" size="2" color="#ff0000" />
+
+    {% endfor %}
+    <p>Девелоперы</p>
+    {% for developer in project.developers.all %}
+    <p>{{developer.username}}</p>
+    {% endfor %}
+</div>
+</body>

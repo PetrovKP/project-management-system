@@ -9,6 +9,11 @@ class ProjectManager(models.Manager):
     def get_all_for_user(user):
         return Project.objects.filter(Q(developers=user) | Q(manager=user)).distinct()
 
+    @staticmethod
+    def is_user_associated(user, project_id):
+        project = Project.objects.get(id=project_id)
+        return user in project.manager.all() or user in project.developers.all()
+
 
 class TicketStatus(models.Model):
     title = models.CharField(max_length=20)
@@ -44,14 +49,21 @@ class Ticket(models.Model):
     description = models.TextField()
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     assignee = models.ForeignKey(User, related_name='assignee')
-    reporter = models.ForeignKey(User, related_name='reporter')
+    reporter = models.ForeignKey(User, related_name='reporter', blank=True, null=True)
     status = models.ForeignKey(TicketStatus, on_delete=models.PROTECT)
     created_date = models.DateField(auto_now_add=True)
     due_date = models.DateField()
     time_estimated = models.IntegerField() #probably change to float
-    time_remaining = models.IntegerField() #do not forget to decrement after logged time added
-    time_logged = models.IntegerField()
+    time_remaining = models.IntegerField(blank=True) #do not forget to decrement after logged time added
+    time_logged = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
 
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None, *args, **kwargs):
+        if self.status is None:
+            self.status = TicketStatus.objects.get(title="Open")
+        if self.time_remaining is None:
+            self.time_remaining = self.time_estimated
+        super(Ticket, self).save(*args, **kwargs)
