@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Q
 
-
 class ProjectManager(models.Manager):
 
     @staticmethod
@@ -13,6 +12,26 @@ class ProjectManager(models.Manager):
     def is_user_associated(user, project_id):
         project = Project.objects.get(id=project_id)
         return user in project.manager.all() or user in project.developers.all()
+
+    @staticmethod
+    def is_user_project_manager(user, project_id):
+        project = Project.objects.get(id=project_id)
+        return user in project.manager.all()
+
+
+class TicketManager(models.Manager):
+
+    @staticmethod
+    def save_ticket(title, description, project, assignee, reporter, status, due_date, time_estimated):
+        return Ticket(title=title, description=description, project=project, assignee=assignee, reporter=reporter,
+                      status=status, due_date=due_date, time_estimated=time_estimated).save()
+
+    @staticmethod
+    def save_ticket_form_form(form, project_id, user):
+        ticket = form.save(commit=False)
+        ticket.project = Project.objects.get(id=project_id)
+        ticket.assignee = user
+        return ticket.save()
 
 
 class TicketStatus(models.Model):
@@ -57,6 +76,8 @@ class Ticket(models.Model):
     time_remaining = models.IntegerField(blank=True) #do not forget to decrement after logged time added
     time_logged = models.IntegerField(default=0)
 
+    objects = TicketManager()
+
     def __str__(self):
         return self.title
 
@@ -67,3 +88,6 @@ class Ticket(models.Model):
         if self.time_remaining is None:
             self.time_remaining = self.time_estimated
         super(Ticket, self).save(*args, **kwargs)
+
+
+

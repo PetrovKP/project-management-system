@@ -1,6 +1,8 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import TemplateView
+from django.urls import reverse
+from django.views.generic import TemplateView, FormView
 from .models import Project, Ticket, TicketStatus
+from .forms import TicketForm
 
 
 class AccessToProjectMixin(LoginRequiredMixin):
@@ -8,6 +10,15 @@ class AccessToProjectMixin(LoginRequiredMixin):
         project_id = self.kwargs['project_id']
         if Project.objects.is_user_associated(request.user, project_id):
             return super(AccessToProjectMixin, self).dispatch(request, *args, **kwargs)
+        else:
+            return self.handle_no_permission()
+
+
+class ProjectManagerRequiredMixin(LoginRequiredMixin):
+    def dispatch(self, request, *args, **kwargs):
+        project_id = self.kwargs['project_id']
+        if Project.objects.is_user_project_manager(request.user, project_id):
+            return super(ProjectManagerRequiredMixin, self).dispatch(request, *args, **kwargs)
         else:
             return self.handle_no_permission()
 
@@ -41,3 +52,14 @@ class TicketView(AccessToProjectMixin, TemplateView):
         ticket_id = kwargs['ticket_id']
         context['ticket'] = Ticket.objects.get(id=ticket_id)
         return context
+
+
+class CreationTicketView(ProjectManagerRequiredMixin, FormView):
+    template_name = "app/creation_ticket_template.html"
+    form_class = TicketForm
+    success_url = '/'
+
+    def form_valid(self, form):
+        self.success_url = reverse('project', args=(self.kwargs['project_id'],))
+        Ticket.objects.save_ticket_form_form(form, self.kwargs['project_id'], self.request.user)
+        return super(CreationTicketView, self).form_valid(form)
