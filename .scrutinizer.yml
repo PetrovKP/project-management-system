@@ -19,8 +19,6 @@ build:
         override:
             - 'pip install -r requirements.txt'
             - 'pip install pycodestyle'
-            - 'pip install flake8'
     tests:
         override:
-            - command: pycodestyle --max-line-length=119 ./posos/app
-            # - command: flake8 --max-line-length=119 ./app
+            - command: pycodestyle --max-line-length=119 --exclude=*migrations* ./posos/app

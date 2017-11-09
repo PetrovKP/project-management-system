@@ -1,5 +1,5 @@
 [run]
-source = app
+source = posos/app
 branch = True
 omit =
     posos/app/migrations/*
