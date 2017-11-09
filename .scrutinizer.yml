@@ -14,13 +14,14 @@ build:
         python: '3.5.1'
         variables:
             DJANGO_SETTINGS_MODULES: settings
-#            DATABASE_URL: postgres://scrutinizer:scrutinizer@localhost:5434/localized_fields
-#       postgresql: true
 
     dependencies:
         override:
             - 'pip install -r requirements.txt'
             - 'pip install pycodestyle'
+            - 'pip install flake8'
     tests:
         override:
-            - command: pycodestyle ./posos/app
+            - command: cd posos
+            - command: pycodestyle --max-line-length=119 ./app
+            - command: flake8 --max-line-length=119 ./app

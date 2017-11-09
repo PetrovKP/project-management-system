@@ -6,6 +6,6 @@ pipelines:
           - pip install -r requirements.txt
           - pip install codecov
           - cd posos
-          - python manage.py test app
-          - coverage run manage.py test app
+          - python manage.py test
+          - coverage run manage.py test
           - codecov --token 72870f79-c051-442c-8e4c-355dad2cef29
