@@ -7,8 +7,8 @@ tools:
         python_version: '3'
 filter:
     excluded_paths:
-        - '*/tests/*'
-        - '*/migrations/*'
+        - './posos/app/tests.py*'
+        - './posos/app/migrations/*'
 build:
     environment:
         python: '3.5.1'
@@ -22,6 +22,5 @@ build:
             - 'pip install flake8'
     tests:
         override:
-            - command: cd posos
-            - command: pycodestyle --max-line-length=119 ./app
-            - command: flake8 --max-line-length=119 ./app
+            - command: pycodestyle --max-line-length=119 ./posos/app
+            # - command: flake8 --max-line-length=119 ./app

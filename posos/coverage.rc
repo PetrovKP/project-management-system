@@ -1,0 +1,10 @@
+[run]
+source = app
+branch = True
+omit =
+    posos/app/migrations/*
+    posos/posos/*
+    posos/manage.py
+source = django
+
+ignore_errors = True
