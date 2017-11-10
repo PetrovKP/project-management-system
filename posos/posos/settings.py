@@ -76,8 +76,6 @@ WSGI_APPLICATION = 'posos.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-# TODO:
-# Заполнить Сереже!
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

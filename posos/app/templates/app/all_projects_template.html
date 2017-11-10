@@ -1,0 +1,10 @@
+{% block content %}
+<body>
+<div>
+    {% for project in projects %}
+    <p>{{project.title}}</p>
+    {% endfor %}
+    <a href="/accounts/logout" >Разлогиниться</a>
+</div>
+</body>
+{% endblock %}
