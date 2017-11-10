@@ -1,9 +1,38 @@
-
-<body>
-<div align="center">
-    <p>Title: {{ticket.title}}</p>
-    <p>Description: {{ticket.description}}</p>
-    <p>Reporter: {{ticket.reporter}}</p>
-    <p>Status: {{ticket.status}}</p>
+{% extends "./base.html" %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-8">
+            <div class="row">
+                <h4>{{ticket.title}}</h4>
+            </div>
+            <div class="row">
+                <h6>{{ticket.description}}</h6>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="row">
+                Status: {{ticket.status}}
+            </div>
+            <div class="row">
+                Assignee: {{ticket.assignee}}
+            </div>
+            <div class="row">
+                Reporter: {{ticket.reporter}}
+            </div>
+            <div class="row">
+                Due Date: {{ticket.due_date}}
+            </div>
+            <div class="row">
+                Time Estimated: {{ticket.time_estimated}}
+            </div>
+            <div class="row">
+                Time Remaining: {{ticket.time_remaining}}
+            </div>
+            <div class="row">
+                Time Logged: {{ticket.time_logged}}
+            </div>
+        </div>
+    </div>
 </div>
-</body>
+{% endblock %}

@@ -1,25 +1,28 @@
-
-<body>
-<div align="center">
-    <p align="left">Дезигн</p>
-    <p>{{project.id}}</p>
-    <p>{{project.title}}</p>
-    <p>{{project.description}}</p>
-
-    {% for status in status_list %}
-        <br>
-        <h4>{{status}}</h4>
-        {% for ticket in tickets %}
-            {% if ticket.status == status %}
-            <a href="{% url 'ticket' project_id=project.id ticket_id=ticket.id %}">{{ticket.title}}</a>
-            {% endif %}
+{% extends "./base.html" %}
+{% block content %}
+<div class="container">
+    <h3>Project: {{project.title}}</h3>
+    <h4 style="padding: 15px">{{project.description}}</h4>
+    <div class="flex-parent">
+        {% for status in status_list %}
+        <div class="stolb">
+            <div class="title">{{ status }}</div>
+            {% for ticket in tickets %}
+                {% if ticket.status == status %}
+                <div class="card" style="width: 20rem; margin-bottom: 10px">
+                  <div class="card-body">
+                    <h4 class="card-title">
+                        <a href="{% url 'ticket' project_id=project.id ticket_id=ticket.id %}">{{ticket.title}}</a>
+                    </h4>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ticket.assignee}}</h6>
+                    <p class="card-text">{{ticket.description}}</p>
+                  </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
         {% endfor %}
-        <hr width="500" size="2" color="#ff0000" />
-
-    {% endfor %}
-    <p>Девелоперы</p>
-    {% for developer in project.developers.all %}
-    <p>{{developer.username}}</p>
-    {% endfor %}
+    </div>
 </div>
-</body>
+
+{% endblock %}

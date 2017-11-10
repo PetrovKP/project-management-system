@@ -1,11 +1,24 @@
 {% extends "./base.html" %}
 {% block content %}
-<body>
-<div>
-    {% for project in projects %}
-    <p>{{project.title}}</p>
-    {% endfor %}
-    <a href="/accounts/logout" >Разлогиниться</a>
+<div class="container">
+<h4>Your projects:</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Due Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for project in projects %}
+        <tr>
+            <td scope="row">
+                <a href="/project/{{project.id}}">{{project.title}}</a>
+            </td>
+            <td>{{project.due_date}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 </div>
-</body>
 {% endblock %}
