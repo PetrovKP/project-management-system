@@ -7,15 +7,13 @@ tools:
         python_version: '3'
 filter:
     excluded_paths:
-        - '*/tests/*'
-        - '*/migrations/*'
+        - './posos/app/tests.py*'
+        - './posos/app/migrations/*'
 build:
     environment:
         python: '3.5.1'
         variables:
             DJANGO_SETTINGS_MODULES: settings
-#            DATABASE_URL: postgres://scrutinizer:scrutinizer@localhost:5434/localized_fields
-#       postgresql: true
 
     dependencies:
         override:
@@ -23,4 +21,4 @@ build:
             - 'pip install pycodestyle'
     tests:
         override:
-            - command: pycodestyle ./posos/app
+            - command: pycodestyle --max-line-length=119 --exclude=*migrations* ./posos/app
