@@ -9,4 +9,3 @@ urlpatterns = [
     url(r'^project/(?P<project_id>[0-9]+)/ticket/(?P<ticket_id>[0-9]+)', TicketView.as_view(), name='ticket'),
     url(r'^project/(?P<project_id>[0-9]+)/ticket/new', CreationTicketView.as_view(), name='new_ticket'),
 ]
-

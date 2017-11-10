@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Q
 
+
 class ProjectManager(models.Manager):
 
     @staticmethod
@@ -72,8 +73,8 @@ class Ticket(models.Model):
     status = models.ForeignKey(TicketStatus, on_delete=models.PROTECT)
     created_date = models.DateField(auto_now_add=True)
     due_date = models.DateField()
-    time_estimated = models.IntegerField() #probably change to float
-    time_remaining = models.IntegerField(blank=True) #do not forget to decrement after logged time added
+    time_estimated = models.IntegerField()  # probably change to float
+    time_remaining = models.IntegerField(blank=True)  # do not forget to decrement after logged time added
     time_logged = models.IntegerField(default=0)
 
     objects = TicketManager()
@@ -88,6 +89,3 @@ class Ticket(models.Model):
         if self.time_remaining is None:
             self.time_remaining = self.time_estimated
         super(Ticket, self).save(*args, **kwargs)
-
-
-
