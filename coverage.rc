@@ -1,0 +1,7 @@
+[run]
+source = posos/app
+branch = True
+omit =
+    posos/app/migrations/*
+    posos/posos/*
+    posos/manage.py
