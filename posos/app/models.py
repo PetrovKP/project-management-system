@@ -19,6 +19,12 @@ class ProjectManager(models.Manager):
         project = Project.objects.get(id=project_id)
         return user in project.manager.all()
 
+    @staticmethod
+    def update_project_status(status, project_id):
+        project = Project.objects.get(id=project_id)
+        project.status = status
+        project.save()
+
 
 class TicketManager(models.Manager):
 

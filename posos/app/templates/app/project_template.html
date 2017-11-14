@@ -3,6 +3,17 @@
 <div class="container">
     <h3>Project: {{project.title}}</h3>
     <h4 style="padding: 15px">{{project.description}}</h4>
+
+    <div>
+        <h4 style="padding: 15px">{{project.status}}</h4>
+        <form class="status" method="POST">
+        {% csrf_token %}
+        {{ forms.status.as_p }}
+
+        <button name='action' value='status' type="submit">Update status</button>
+        </form>
+    </div>
+
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
         New ticket
     </button>

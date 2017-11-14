@@ -1,6 +1,6 @@
 from django.forms import ModelForm, DateInput
 
-from .models import Ticket
+from .models import Ticket, Project
 
 
 class DateInputt(DateInput):
@@ -14,3 +14,9 @@ class TicketForm(ModelForm):
         widgets = {
             'due_date': DateInputt(),
         }
+
+
+class ProjectStatusForm(ModelForm):
+    class Meta:
+        model = Project
+        fields = ['status']
