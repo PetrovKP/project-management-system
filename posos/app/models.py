@@ -31,7 +31,7 @@ class TicketManager(models.Manager):
     def save_ticket_form_form(form, project_id, user):
         ticket = form.save(commit=False)
         ticket.project = Project.objects.get(id=project_id)
-        ticket.assignee = user
+        ticket.reporter = user
         return ticket.save()
 
 

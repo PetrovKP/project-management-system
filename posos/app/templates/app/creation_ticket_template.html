@@ -1,6 +1,5 @@
 {% block content %}
-<body>
-<div>
+<div class="container">
     <form action="" method="post">
         {% csrf_token %}
         <!--{{form.title}}-->
@@ -9,10 +8,9 @@
         <!--https://docs.djangoproject.com/en/1.11/topics/forms/-->
 
         {{form.as_p}}
-        <input type="submit" value="Sumbit"/>
+        <input type="submit" value="Submit"/>
     <!--{{form.as_table}}-->
     <!--{{form.as_ul}}-->
     </form>
 </div>
-</body>
 {% endblock %}
