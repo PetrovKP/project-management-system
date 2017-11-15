@@ -113,7 +113,7 @@ class TicketView(MultiFormsView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_time_logged_initial(self):
-        return {'time_logged': Ticket.objects.get(id=self.kwargs['ticket_id']).get_time_logged()}
+        return {'time_logged': 0}
 
 
 class CreationTicketView(ProjectManagerRequiredMixin, FormView):
