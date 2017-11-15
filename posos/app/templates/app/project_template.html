@@ -47,7 +47,7 @@
       </div>
     </div>
     
-    {% if True == True %} <!-- TODO: show only to manager -->
+    {% if user in project.manager.all %}
     <!-- Modal -->
     <div class="modal fade" id="updateStatusModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
