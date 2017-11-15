@@ -27,6 +27,7 @@ class TicketStatusForm(ModelForm):
         model = Ticket
         fields = ['status']
 
+
 class TicketAssigneeForm(ModelForm):
     class Meta:
         model = Ticket

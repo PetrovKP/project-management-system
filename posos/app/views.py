@@ -74,13 +74,13 @@ class TicketView(MultiFormsView):
         return context
 
     def status_form_valid(self, form):
-        # self.success_url = reverse('ticket', args=(self.kwargs['ticket_id'],))
+        self.success_url = reverse('ticket', args=(self.kwargs['project_id'], self.kwargs['ticket_id'],))
         status = form.cleaned_data['status']
         Ticket.objects.update_ticket_status(status, self.kwargs['ticket_id'])
         return HttpResponseRedirect(self.get_success_url())
 
     def assignee_form_valid(self, form):
-        # self.success_url = reverse('ticket', args=(self.kwargs['ticket_id'],))
+        self.success_url = reverse('ticket', args=(self.kwargs['project_id'], self.kwargs['ticket_id'],))
         assignee = form.cleaned_data['assignee']
         Ticket.objects.update_ticket_assignee(assignee, self.kwargs['ticket_id'])
         return HttpResponseRedirect(self.get_success_url())
