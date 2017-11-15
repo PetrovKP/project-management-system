@@ -2,17 +2,11 @@
 {% block header %}{% endblock %}
 {% block content %}
 <div class="container">
-    <form action="" method="post">
-        {% csrf_token %}
-        <!--{{form.title}}-->
-        
-        <!--!!!!!!!!!!!!!!-->
-        <!--https://docs.djangoproject.com/en/1.11/topics/forms/-->
-
-        {{form.as_p}}
-        <input class="btn btn-primary" type="submit" value="Submit"/>
-    <!--{{form.as_table}}-->
-    <!--{{form.as_ul}}-->
+    <form class="ticket" method="POST">
+    {% csrf_token %}
+    {{ forms.ticket.as_p }}
+    <!--https://docs.djangoproject.com/en/1.11/topics/forms/-->
+    <button name='action' value='ticket' type="submit">Create ticket</button>
     </form>
 </div>
 {% endblock %}
