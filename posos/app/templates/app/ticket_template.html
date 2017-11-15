@@ -27,10 +27,10 @@
                 Time Estimated: {{ticket.time_estimated}}
             </div>
             <div class="row">
-                Time Remaining: {{ticket.time_remaining}}
+                <a data-toggle="modal" data-target="#updateRemainingTimeModal">Time Remaining: {{ticket.time_remaining}}</a>
             </div>
             <div class="row">
-                Time Logged: {{ticket.time_logged}}
+                <a data-toggle="modal" data-target="#updateLoggedTimeModal">Time Logged: {{ticket.time_logged}}</a>
             </div>
         </div>
     </div>
@@ -72,6 +72,48 @@
             {{ forms.assignee.as_p }}
 
             <button name='action' class="btn btn-primary" value='assignee' type="submit">Save</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="updateRemainingTimeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Remaining time</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form class="time_remaining" method="POST">
+            {% csrf_token %}
+            {{ forms.time_remaining.as_p }}
+
+            <button name='action' class="btn btn-primary" value='time_remaining' type="submit">Save</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="updateLoggedTimeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Log time</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form class="time_logged" method="POST">
+            {% csrf_token %}
+            {{ forms.time_logged.as_p }}
+
+            <button name='action' class="btn btn-primary" value='time_logged' type="submit">Save</button>
             </form>
           </div>
         </div>

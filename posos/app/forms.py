@@ -32,3 +32,13 @@ class TicketAssigneeForm(ModelForm):
     class Meta:
         model = Ticket
         fields = ['assignee']
+
+class TicketTimeRemainingForm(ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['time_remaining']
+
+class TicketTimeLoggedForm(ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['time_logged']

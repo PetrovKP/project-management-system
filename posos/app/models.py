@@ -58,6 +58,12 @@ class TicketManager(models.Manager):
         ticket.time_remaining = time_remaining
         ticket.save()
 
+    @staticmethod
+    def update_ticket_logged_time(time_logged, ticket_id):
+        ticket = Ticket.objects.get(id=ticket_id)
+        ticket.time_logged = time_logged # TODO: change logic
+        ticket.save()
+
 
 class TicketStatus(models.Model):
     title = models.CharField(max_length=20)
@@ -108,6 +114,18 @@ class Ticket(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_status(self):
+        return self.status
+
+    def get_assignee(self):
+        return self.assignee
+
+    def get_time_remaining(self):
+        return self.time_remaining
+
+    def get_time_logged(self):
+        return self.time_logged
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None, *args, **kwargs):

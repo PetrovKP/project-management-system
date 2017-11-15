@@ -5,7 +5,8 @@ from django.views.generic import TemplateView, FormView
 
 from .view.generic.multiform import MultiFormsView
 from .models import Project, Ticket, TicketStatus
-from .forms import TicketForm, ProjectStatusForm, TicketStatusForm, TicketAssigneeForm
+from .forms import TicketForm, ProjectStatusForm, TicketStatusForm, TicketAssigneeForm, \
+                    TicketTimeRemainingForm, TicketTimeLoggedForm
 
 
 class AccessToProjectMixin(LoginRequiredMixin):
@@ -67,7 +68,9 @@ class ProjectView(MultiFormsView):
 class TicketView(MultiFormsView):
     template_name = "app/ticket_template.html"
     form_classes = {'status': TicketStatusForm,
-                    'assignee': TicketAssigneeForm}
+                    'assignee': TicketAssigneeForm,
+                    'time_remaining': TicketTimeRemainingForm,
+                    'time_logged': TicketTimeLoggedForm}
     success_url = '/'
 
     def get_context_data(self, **kwargs):
@@ -82,11 +85,35 @@ class TicketView(MultiFormsView):
         Ticket.objects.update_ticket_status(status, self.kwargs['ticket_id'])
         return HttpResponseRedirect(self.get_success_url())
 
+    def get_status_initial(self):
+        return {'status': Ticket.objects.get(id=self.kwargs['ticket_id']).get_status()}
+
     def assignee_form_valid(self, form):
         self.success_url = reverse('ticket', args=(self.kwargs['project_id'], self.kwargs['ticket_id'],))
         assignee = form.cleaned_data['assignee']
         Ticket.objects.update_ticket_assignee(assignee, self.kwargs['ticket_id'])
         return HttpResponseRedirect(self.get_success_url())
+
+    def get_assignee_initial(self):
+        return {'assignee': Ticket.objects.get(id=self.kwargs['ticket_id']).get_assignee()}
+
+    def time_remaining_form_valid(self, form):
+        self.success_url = reverse('ticket', args=(self.kwargs['project_id'], self.kwargs['ticket_id'],))
+        time_remaining = form.cleaned_data['time_remaining']
+        Ticket.objects.update_ticket_remaining_time(time_remaining, self.kwargs['ticket_id'])
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_time_remaining_initial(self):
+        return {'time_remaining': Ticket.objects.get(id=self.kwargs['ticket_id']).get_time_remaining()}
+
+    def time_logged_form_valid(self, form):
+        self.success_url = reverse('ticket', args=(self.kwargs['project_id'], self.kwargs['ticket_id'],))
+        time_logged = form.cleaned_data['time_logged']
+        Ticket.objects.update_ticket_logged_time(time_logged, self.kwargs['ticket_id'])
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_time_logged_initial(self):
+        return {'time_logged': Ticket.objects.get(id=self.kwargs['ticket_id']).get_time_logged()}
 
 
 class CreationTicketView(ProjectManagerRequiredMixin, FormView):
