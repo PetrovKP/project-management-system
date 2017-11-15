@@ -13,6 +13,7 @@
     .title {font-size: 26px; margin-bottom: 20px}
 </style>
 <body>
+    {% block header %}
     <div class="container">
         <header class="header clearfix" style="margin-bottom: 20px; margin-top: 20px;">
             <nav>
@@ -28,6 +29,7 @@
             <h3 class="text-muted"><font color="">Project Management System</font></h3>
         </header>
     </div>
+    {% endblock %}
     {% block content %} {% endblock %}
 </body>
 </html>

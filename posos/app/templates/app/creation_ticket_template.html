@@ -1,3 +1,5 @@
+{% extends "./base.html" %}
+{% block header %}{% endblock %}
 {% block content %}
 <div class="container">
     <form action="" method="post">
@@ -8,7 +10,7 @@
         <!--https://docs.djangoproject.com/en/1.11/topics/forms/-->
 
         {{form.as_p}}
-        <input type="submit" value="Submit"/>
+        <input class="btn btn-primary" type="submit" value="Submit"/>
     <!--{{form.as_table}}-->
     <!--{{form.as_ul}}-->
     </form>

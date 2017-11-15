@@ -32,16 +32,23 @@ class AllProjectsView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class ProjectView(AccessToProjectMixin, TemplateView):
+class ProjectView(AccessToProjectMixin, FormView):
     template_name = "app/project_template.html"
+    form_class = TicketForm
+    success_url = '/'
 
     def get_context_data(self, **kwargs):
         context = super(ProjectView, self).get_context_data()
-        project_id = kwargs['project_id']
+        project_id = self.kwargs['project_id']
         context['project'] = Project.objects.get(id=project_id)
         context['tickets'] = Ticket.objects.filter(project__id=project_id)
         context['status_list'] = TicketStatus.objects.all()
         return context
+
+    def form_valid(self, form):
+        self.success_url = reverse('project', args=(self.kwargs['project_id'],))
+        Ticket.objects.save_ticket_form_form(form, self.kwargs['project_id'], self.request.user)
+        return super(ProjectView, self).form_valid(form)
 
 
 class TicketView(AccessToProjectMixin, TemplateView):
