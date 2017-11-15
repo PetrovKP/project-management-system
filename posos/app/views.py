@@ -41,6 +41,9 @@ class ProjectView(MultiFormsView):
                     'status': ProjectStatusForm}
     success_url = '/'
 
+    def get_status_initial(self):
+        return {'status': Project.objects.get(id=self.kwargs['project_id']).get_status()}
+
     def get_context_data(self, **kwargs):
         context = super(ProjectView, self).get_context_data(**kwargs)
         project_id = self.kwargs['project_id']

@@ -87,6 +87,9 @@ class Project(models.Model):
     def __str__(self):
         return self.title
 
+    def get_status(self):
+        return self.status
+
 
 class Ticket(models.Model):
     title = models.CharField(max_length=40)

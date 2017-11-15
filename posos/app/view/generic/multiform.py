@@ -2,6 +2,8 @@ from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.views.generic.base import ContextMixin, TemplateResponseMixin
 from django.views.generic.edit import ProcessFormView
 
+# https://stackoverflow.com/questions/15497693/django-can-class-based-views-accept-two-forms-at-a-time
+
 
 class MultiFormMixin(ContextMixin):
     form_classes = {}
