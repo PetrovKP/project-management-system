@@ -35,15 +35,6 @@ class AllProjectsView(LoginRequiredMixin, TemplateView):
         return context
 
 
-<<<<<<< HEAD
-class ProjectView(AccessToProjectMixin, FormView):
-    template_name = "app/project_template.html"
-    form_class = TicketForm
-    success_url = '/'
-
-    def get_context_data(self, **kwargs):
-        context = super(ProjectView, self).get_context_data()
-=======
 class ProjectView(MultiFormsView):
     template_name = "app/project_template.html"
     form_classes = {'ticket': TicketForm,
@@ -52,19 +43,12 @@ class ProjectView(MultiFormsView):
 
     def get_context_data(self, **kwargs):
         context = super(ProjectView, self).get_context_data(**kwargs)
->>>>>>> 62b0ff54235aa7c56afbf0f31201fd714d11384e
         project_id = self.kwargs['project_id']
         context['project'] = Project.objects.get(id=project_id)
         context['tickets'] = Ticket.objects.filter(project__id=project_id)
         context['status_list'] = TicketStatus.objects.all()
         return context
 
-<<<<<<< HEAD
-    def form_valid(self, form):
-        self.success_url = reverse('project', args=(self.kwargs['project_id'],))
-        Ticket.objects.save_ticket_form_form(form, self.kwargs['project_id'], self.request.user)
-        return super(ProjectView, self).form_valid(form)
-=======
     def ticket_form_valid(self, form):
         self.success_url = reverse('project', args=(self.kwargs['project_id'],))
         Ticket.objects.save_ticket_form_form(form, self.kwargs['project_id'], self.request.user)
@@ -75,7 +59,6 @@ class ProjectView(MultiFormsView):
         status = form.cleaned_data['status']
         Project.objects.update_project_status(status, self.kwargs['project_id'])
         return HttpResponseRedirect(self.get_success_url())
->>>>>>> 62b0ff54235aa7c56afbf0f31201fd714d11384e
 
 
 class TicketView(AccessToProjectMixin, TemplateView):
