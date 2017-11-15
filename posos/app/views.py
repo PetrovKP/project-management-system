@@ -5,7 +5,7 @@ from django.views.generic import TemplateView, FormView
 
 from .view.generic.multiform import MultiFormsView
 from .models import Project, Ticket, TicketStatus
-from .forms import TicketForm, ProjectStatusForm
+from .forms import TicketForm, ProjectStatusForm, TicketStatusForm, TicketAssigneeForm
 
 
 class AccessToProjectMixin(LoginRequiredMixin):
@@ -61,14 +61,29 @@ class ProjectView(MultiFormsView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class TicketView(AccessToProjectMixin, TemplateView):
+class TicketView(MultiFormsView):
     template_name = "app/ticket_template.html"
+    form_classes = {'status': TicketStatusForm,
+                    'assignee': TicketAssigneeForm}
+    success_url = '/'
 
     def get_context_data(self, **kwargs):
-        context = super(TicketView, self).get_context_data()
-        ticket_id = kwargs['ticket_id']
+        context = super(TicketView, self).get_context_data(**kwargs)
+        ticket_id = self.kwargs['ticket_id']
         context['ticket'] = Ticket.objects.get(id=ticket_id)
         return context
+
+    def status_form_valid(self, form):
+        # self.success_url = reverse('ticket', args=(self.kwargs['ticket_id'],))
+        status = form.cleaned_data['status']
+        Ticket.objects.update_ticket_status(status, self.kwargs['ticket_id'])
+        return HttpResponseRedirect(self.get_success_url())
+
+    def assignee_form_valid(self, form):
+        # self.success_url = reverse('ticket', args=(self.kwargs['ticket_id'],))
+        assignee = form.cleaned_data['assignee']
+        Ticket.objects.update_ticket_assignee(assignee, self.kwargs['ticket_id'])
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class CreationTicketView(ProjectManagerRequiredMixin, FormView):

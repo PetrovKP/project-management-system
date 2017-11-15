@@ -20,3 +20,14 @@ class ProjectStatusForm(ModelForm):
     class Meta:
         model = Project
         fields = ['status']
+
+
+class TicketStatusForm(ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['status']
+
+class TicketAssigneeForm(ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['assignee']

@@ -40,6 +40,24 @@ class TicketManager(models.Manager):
         ticket.reporter = user
         return ticket.save()
 
+    @staticmethod
+    def update_ticket_status(status, ticket_id):
+        ticket = Ticket.objects.get(id=ticket_id)
+        ticket.status = status
+        ticket.save()
+
+    @staticmethod
+    def update_ticket_assignee(assignee, ticket_id):
+        ticket = Ticket.objects.get(id=ticket_id)
+        ticket.assignee = assignee
+        ticket.save()
+
+    @staticmethod
+    def update_ticket_remaining_time(time_remaining, ticket_id):
+        ticket = Ticket.objects.get(id=ticket_id)
+        ticket.time_remaining = time_remaining
+        ticket.save()
+
 
 class TicketStatus(models.Model):
     title = models.CharField(max_length=20)
