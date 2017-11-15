@@ -1,14 +1,26 @@
 {% extends "./base.html" %}
 {% block content %}
 <div class="container">
-    <h3>Project: {{project.title}}</h3>
-    <h4 style="padding: 15px">{{project.description}}</h4>
-
-    <h4 style="padding: 15px" data-toggle="modal" data-target="#updateStatusModal">Status: {{project.status}}</h4>
-
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newTicketModal">
-        New ticket
-    </button>
+    <div class="row" style="margin-bottom: 20px">
+        <div class="col-md-8">
+            <div class="row">
+                <h3>Project: {{project.title}}</h3>
+            </div>
+            <div class="row">
+                <h4 style="padding: 15px">{{project.description}}</h4>
+            </div>
+        </div>
+        <div class="col-md-4" >
+            <div class="row">
+                <h4 style="padding: 15px" data-toggle="modal" data-target="#updateStatusModal">Status: {{project.status}}</h4>
+            </div>
+            <div class="row">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newTicketModal">
+                    New ticket
+                </button>
+            </div>
+        </div>
+    </div>
     <div class="flex-parent">
         {% for status in status_list %}
         <div class="stolb">
