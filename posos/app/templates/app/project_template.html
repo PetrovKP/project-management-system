@@ -11,17 +11,17 @@
             </div>
         </div>
         <div class="col-md-4" >
-            <div class="row" style="margin-bottom: 10px">
-                <h4 style="padding: 15px" data-toggle="modal" data-target="#updateStatusModal">Status: {{project.status}}</h4>
+            <div class="row">
+                <h4 style="padding-left: 10px" data-toggle="modal" data-target="#updateStatusModal">Status: {{project.status}}</h4>
+            </div>
+            <div class="row">
+              <div id="chartdiv" style="top:-30px;left: -30px; width: 200px; height: 200px"></div>
+              {% include "./statistics.html" %}
             </div>
             <div class="row" style="margin-bottom: 10px">
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newTicketModal">
                     New ticket
                 </button>
-            </div>
-            <div class="row">
-              <div id="chartdiv" style="top:-30px;left: -30px; width: 200px; height: 200px"></div>
-              {% include "./statistics.html" %}
             </div>
         </div>
     </div>
