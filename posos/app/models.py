@@ -19,6 +19,12 @@ class ProjectManager(models.Manager):
         project = Project.objects.get(id=project_id)
         return user in project.manager.all()
 
+    @staticmethod
+    def update_project_status(status, project_id):
+        project = Project.objects.get(id=project_id)
+        project.status = status
+        project.save()
+
 
 class TicketManager(models.Manager):
 
@@ -31,8 +37,34 @@ class TicketManager(models.Manager):
     def save_ticket_form_form(form, project_id, user):
         ticket = form.save(commit=False)
         ticket.project = Project.objects.get(id=project_id)
-        ticket.assignee = user
+        ticket.reporter = user
         return ticket.save()
+
+    @staticmethod
+    def update_ticket_status(status, ticket_id):
+        ticket = Ticket.objects.get(id=ticket_id)
+        ticket.status = status
+        ticket.save()
+
+    @staticmethod
+    def update_ticket_assignee(assignee, ticket_id):
+        ticket = Ticket.objects.get(id=ticket_id)
+        ticket.assignee = assignee
+        ticket.save()
+
+    @staticmethod
+    def update_ticket_remaining_time(time_remaining, ticket_id):
+        ticket = Ticket.objects.get(id=ticket_id)
+        ticket.time_remaining = time_remaining
+        ticket.save()
+
+    @staticmethod
+    def update_ticket_logged_time(time_logged, ticket_id):
+        ticket = Ticket.objects.get(id=ticket_id)
+        ticket.time_logged = ticket.time_logged + time_logged
+        ticket.time_remaining = ticket.time_remaining - time_logged \
+                if ticket.time_remaining > time_logged else 0
+        ticket.save()
 
 
 class TicketStatus(models.Model):
@@ -63,6 +95,9 @@ class Project(models.Model):
     def __str__(self):
         return self.title
 
+    def get_status(self):
+        return self.status
+
 
 class Ticket(models.Model):
     title = models.CharField(max_length=40)
@@ -81,6 +116,18 @@ class Ticket(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_status(self):
+        return self.status
+
+    def get_assignee(self):
+        return self.assignee
+
+    def get_time_remaining(self):
+        return self.time_remaining
+
+    def get_time_logged(self):
+        return self.time_logged
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None, *args, **kwargs):

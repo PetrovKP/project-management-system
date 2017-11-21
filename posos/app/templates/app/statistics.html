@@ -1,0 +1,38 @@
+<!-- TODO: better do in python -->
+<script type="text/javascript">
+    let statuses = {};
+    let tickets = 0;
+    {% for status in status_list %}
+        statuses["{{status}}"] = 0;
+    {% endfor %}
+
+    {% for ticket in tickets %}
+        statuses["{{ticket.status}}"]++;
+        tickets++;
+    {% endfor %}
+
+    let data = [];
+    for (key in statuses) {
+        if (statuses.hasOwnProperty(key)) {
+            data.push({
+                "status": key,
+                "tickets": statuses[key]
+            });
+        }
+    }
+
+    var chart = AmCharts.makeChart( "chartdiv", {
+      "type": "pie",
+      "theme": "light",
+      "dataProvider": data,
+      "valueField": "tickets",
+      "titleField": "status",
+      "labelText": "",
+       "balloon":{
+       "fixedPosition":true
+      },
+      "export": {
+        "enabled": false
+      }
+    });
+</script>
