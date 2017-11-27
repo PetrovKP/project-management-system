@@ -18,11 +18,20 @@
               <div id="chartdiv" style="top:-30px;left: -30px; width: 200px; height: 200px"></div>
               {% include "./statistics.html" %}
             </div>
+            {% if user in project.manager.all %}
             <div class="row" style="margin-bottom: 10px">
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newTicketModal">
                     New ticket
                 </button>
             </div>
+            {% endif %}
+            {% if user in project.manager.all %}
+            <div class="row" style="margin-bottom: 10px">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#projectDevelopersModal">
+                    Developers
+                </button>
+            </div>
+            {% endif %}
         </div>
     </div>
     <div class="flex-parent">
@@ -78,6 +87,26 @@
             <form class="status" method="POST">
             {% csrf_token %}
             {{ forms.status.as_p }}
+
+            <button name='action' class="btn btn-primary" value='status' type="submit">Save</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div><!-- Modal -->
+    <div class="modal fade" id="projectDevelopersModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Update status</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form class="developers" method="POST">
+            {% csrf_token %}
+            {{ forms.developers.as_p }}
 
             <button name='action' class="btn btn-primary" value='status' type="submit">Save</button>
             </form>

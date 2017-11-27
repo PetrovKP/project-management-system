@@ -21,6 +21,11 @@ class ProjectStatusForm(ModelForm):
         model = Project
         fields = ['status']
 
+class ProjectDevelopersForm(ModelForm):
+    class Meta:
+        model = Project
+        fields = ['developers']
+
 
 class TicketStatusForm(ModelForm):
     class Meta:

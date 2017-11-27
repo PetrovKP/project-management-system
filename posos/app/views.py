@@ -6,7 +6,7 @@ from django.views.generic import TemplateView, FormView
 from .view.generic.multiform import MultiFormsView
 from .models import Project, Ticket, TicketStatus
 from .forms import TicketForm, ProjectStatusForm, TicketStatusForm, TicketAssigneeForm, \
-                    TicketTimeRemainingForm, TicketTimeLoggedForm
+                    TicketTimeRemainingForm, TicketTimeLoggedForm, ProjectDevelopersForm
 
 
 class AccessToProjectMixin(LoginRequiredMixin):
@@ -39,7 +39,8 @@ class AllProjectsView(LoginRequiredMixin, TemplateView):
 class ProjectView(MultiFormsView):
     template_name = "app/project_template.html"
     form_classes = {'ticket': TicketForm,
-                    'status': ProjectStatusForm}
+                    'status': ProjectStatusForm,
+                    'developers': ProjectDevelopersForm}
     success_url = '/'
 
     def get_status_initial(self):
@@ -54,15 +55,18 @@ class ProjectView(MultiFormsView):
         return context
 
     def ticket_form_valid(self, form):
-        self.success_url = reverse('project', args=(self.kwargs['project_id'],))
+        self.success_url = reverse('project', args=(self.kwargs['project_id']))
         Ticket.objects.save_ticket_form_form(form, self.kwargs['project_id'], self.request.user)
         return HttpResponseRedirect(self.get_success_url())
 
     def status_form_valid(self, form):
-        self.success_url = reverse('project', args=(self.kwargs['project_id'],))
+        self.success_url = reverse('project', args=(self.kwargs['project_id']))
         status = form.cleaned_data['status']
         Project.objects.update_project_status(status, self.kwargs['project_id'])
         return HttpResponseRedirect(self.get_success_url())
+
+    def developers_form_valid(self, form):
+        self.success_url = reverse('project', args=(self.kwargs['project_id']))
 
 
 class TicketView(MultiFormsView):
