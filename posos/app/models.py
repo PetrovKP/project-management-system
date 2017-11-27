@@ -25,6 +25,12 @@ class ProjectManager(models.Manager):
         project.status = status
         project.save()
 
+    @staticmethod
+    def update_developers_list(developers, project_id):
+        project = Project.objects.get(id=project_id)
+        project.developers = developers
+        project.save()
+
 
 class TicketManager(models.Manager):
 
@@ -97,6 +103,9 @@ class Project(models.Model):
 
     def get_status(self):
         return self.status
+
+    def get_developers(self):
+        return self.developers.all()
 
 
 class Ticket(models.Model):

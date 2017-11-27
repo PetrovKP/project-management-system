@@ -46,6 +46,9 @@ class ProjectView(MultiFormsView):
     def get_status_initial(self):
         return {'status': Project.objects.get(id=self.kwargs['project_id']).get_status()}
 
+    def get_developers_initial(self):
+        return {'developers': Project.objects.get(id=self.kwargs['project_id']).get_developers()}
+
     def get_context_data(self, **kwargs):
         context = super(ProjectView, self).get_context_data(**kwargs)
         project_id = self.kwargs['project_id']
@@ -55,18 +58,24 @@ class ProjectView(MultiFormsView):
         return context
 
     def ticket_form_valid(self, form):
-        self.success_url = reverse('project', args=(self.kwargs['project_id']))
-        Ticket.objects.save_ticket_form_form(form, self.kwargs['project_id'], self.request.user)
+        project_id = self.kwargs['project_id']
+        self.success_url = reverse('project', args=project_id)
+        Ticket.objects.save_ticket_form_form(form, project_id, self.request.user)
         return HttpResponseRedirect(self.get_success_url())
 
     def status_form_valid(self, form):
-        self.success_url = reverse('project', args=(self.kwargs['project_id']))
+        project_id = self.kwargs['project_id']
+        self.success_url = reverse('project', args=project_id)
         status = form.cleaned_data['status']
-        Project.objects.update_project_status(status, self.kwargs['project_id'])
+        Project.objects.update_project_status(status, project_id)
         return HttpResponseRedirect(self.get_success_url())
 
     def developers_form_valid(self, form):
-        self.success_url = reverse('project', args=(self.kwargs['project_id']))
+        project_id = self.kwargs['project_id']
+        self.success_url = reverse('project', args=project_id)
+        developers = form.cleaned_data['developers']
+        Project.objects.update_developers_list(developers, project_id)
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class TicketView(MultiFormsView):
