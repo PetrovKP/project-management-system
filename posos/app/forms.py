@@ -1,4 +1,4 @@
-from django.forms import ModelForm, DateInput
+from django.forms import ModelForm, DateInput, ModelChoiceField
 
 from .models import Ticket, Project
 
@@ -41,12 +41,10 @@ class TicketAssigneeForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         project_id = kwargs.pop('project_id')
-        # print(self)
         super(TicketAssigneeForm, self).__init__(*args, **kwargs)
-        print(self.fields['assignee'])
-        # print(Ticket.objects.get(id=ticket_id).assignee)
-        self.fields['assignee'] = Project.objects.get(id=project_id).developers
-        # self.queryset = Ticket.objects.filter(id=ticket_id)
+        developers = Project.objects.get(id=project_id).developers
+        developers_forms = ModelChoiceField(queryset=developers)
+        self.fields['assignee'] = developers_forms
 
 
 class TicketTimeRemainingForm(ModelForm):
