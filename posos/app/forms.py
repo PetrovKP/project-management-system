@@ -39,6 +39,15 @@ class TicketAssigneeForm(ModelForm):
         model = Ticket
         fields = ['assignee']
 
+    def __init__(self, *args, **kwargs):
+        project_id = kwargs.pop('project_id')
+        # print(self)
+        super(TicketAssigneeForm, self).__init__(*args, **kwargs)
+        print(self.fields['assignee'])
+        # print(Ticket.objects.get(id=ticket_id).assignee)
+        self.fields['assignee'] = Project.objects.get(id=project_id).developers
+        # self.queryset = Ticket.objects.filter(id=ticket_id)
+
 
 class TicketTimeRemainingForm(ModelForm):
     class Meta:

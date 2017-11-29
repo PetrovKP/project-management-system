@@ -86,6 +86,12 @@ class TicketView(MultiFormsView):
                     'time_logged': TicketTimeLoggedForm}
     success_url = '/'
 
+    def get_form_kwargs(self, form_name, bind_form=False):
+        kw = super(TicketView, self).get_form_kwargs(form_name, bind_form=False)
+        if form_name == 'assignee':
+            kw['project_id'] = self.kwargs['project_id']
+        return kw
+
     def get_context_data(self, **kwargs):
         context = super(TicketView, self).get_context_data(**kwargs)
         ticket_id = self.kwargs['ticket_id']
