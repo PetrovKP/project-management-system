@@ -36,7 +36,7 @@ class AllProjectsView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class ProjectView(MultiFormsView):
+class ProjectView(AccessToProjectMixin, MultiFormsView):
     template_name = "app/project_template.html"
     form_classes = {'ticket': TicketForm,
                     'status': ProjectStatusForm,
@@ -78,7 +78,7 @@ class ProjectView(MultiFormsView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class TicketView(MultiFormsView):
+class TicketView(AccessToProjectMixin, MultiFormsView):
     template_name = "app/ticket_template.html"
     form_classes = {'status': TicketStatusForm,
                     'assignee': TicketAssigneeForm,

@@ -114,11 +114,11 @@ class Ticket(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     assignee = models.ForeignKey(User, related_name='assignee', blank=True, null=True)
     reporter = models.ForeignKey(User, related_name='reporter')
-    status = models.ForeignKey(TicketStatus, on_delete=models.PROTECT)
+    status = models.ForeignKey(TicketStatus, on_delete=models.PROTECT, blank=True, null=True)
     created_date = models.DateField(auto_now_add=True)
     due_date = models.DateField()
-    time_estimated = models.IntegerField()  # probably change to float
-    time_remaining = models.IntegerField(blank=True)  # do not forget to decrement after logged time added
+    time_estimated = models.IntegerField()
+    time_remaining = models.IntegerField(blank=True)
     time_logged = models.IntegerField(default=0)
 
     objects = TicketManager()
@@ -141,7 +141,7 @@ class Ticket(models.Model):
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None, *args, **kwargs):
         if self.status is None:
-            self.status = TicketStatus.objects.get(title="Open")
+            self.status = TicketStatus.objects.get(title="Planned")
         if self.time_remaining is None:
             self.time_remaining = self.time_estimated
         super(Ticket, self).save(*args, **kwargs)
