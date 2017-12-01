@@ -25,6 +25,12 @@ class ProjectManager(models.Manager):
         project.status = status
         project.save()
 
+    @staticmethod
+    def update_developers_list(developers, project_id):
+        project = Project.objects.get(id=project_id)
+        project.developers = developers
+        project.save()
+
 
 class TicketManager(models.Manager):
 
@@ -84,8 +90,8 @@ class ProjectStatus(models.Model):
 class Project(models.Model):
     title = models.CharField(max_length=40)
     description = models.TextField()
-    manager = models.ManyToManyField(User, related_name='managers')
-    developers = models.ManyToManyField(User, related_name='developers')
+    manager = models.ManyToManyField(User, related_name='managers', blank=True)
+    developers = models.ManyToManyField(User, related_name='developers', blank=True)
     status = models.ForeignKey(ProjectStatus, on_delete=models.PROTECT)
     created_date = models.DateField(auto_now_add=True)
     due_date = models.DateField()
@@ -98,18 +104,21 @@ class Project(models.Model):
     def get_status(self):
         return self.status
 
+    def get_developers(self):
+        return self.developers.all()
+
 
 class Ticket(models.Model):
     title = models.CharField(max_length=40)
     description = models.TextField()
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    assignee = models.ForeignKey(User, related_name='assignee')
-    reporter = models.ForeignKey(User, related_name='reporter', blank=True, null=True)
-    status = models.ForeignKey(TicketStatus, on_delete=models.PROTECT)
+    assignee = models.ForeignKey(User, related_name='assignee', blank=True, null=True)
+    reporter = models.ForeignKey(User, related_name='reporter')
+    status = models.ForeignKey(TicketStatus, on_delete=models.PROTECT, blank=True, null=True)
     created_date = models.DateField(auto_now_add=True)
     due_date = models.DateField()
-    time_estimated = models.IntegerField()  # probably change to float
-    time_remaining = models.IntegerField(blank=True)  # do not forget to decrement after logged time added
+    time_estimated = models.IntegerField()
+    time_remaining = models.IntegerField(blank=True)
     time_logged = models.IntegerField(default=0)
 
     objects = TicketManager()
@@ -132,7 +141,7 @@ class Ticket(models.Model):
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None, *args, **kwargs):
         if self.status is None:
-            self.status = TicketStatus.objects.get(title="Open")
+            self.status = TicketStatus.objects.get(title="Planned")
         if self.time_remaining is None:
             self.time_remaining = self.time_estimated
         super(Ticket, self).save(*args, **kwargs)
