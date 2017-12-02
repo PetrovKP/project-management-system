@@ -1,18 +1,12 @@
+{% extends "./base.html" %}
+{% block header %}{% endblock %}
 {% block content %}
-<body>
-<div>
-    <form action="" method="post">
-        {% csrf_token %}
-        <!--{{form.title}}-->
-        
-        <!--!!!!!!!!!!!!!!-->
-        <!--https://docs.djangoproject.com/en/1.11/topics/forms/-->
-
-        {{form.as_p}}
-        <input type="submit" value="Sumbit"/>
-    <!--{{form.as_table}}-->
-    <!--{{form.as_ul}}-->
+<div class="container">
+    <form class="ticket" method="POST">
+    {% csrf_token %}
+    {{ forms.ticket.as_p }}
+    <!--https://docs.djangoproject.com/en/1.11/topics/forms/-->
+    <button name='action' value='ticket' type="submit">Create ticket</button>
     </form>
 </div>
-</body>
 {% endblock %}

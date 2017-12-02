@@ -1,9 +1,123 @@
+{% extends "./base.html" %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-8">
+            <div class="row">
+                <h4>{{ticket.title}}</h4>
+            </div>
+            <div class="row">
+                <h6>{{ticket.description}}</h6>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="row">
+                <a data-toggle="modal" data-target="#updateStatusModal">Status: {{ticket.status}}</a>
+            </div>
+            <div class="row">
+                <a data-toggle="modal" data-target="#updateAssigneeModal">Assignee: {{ticket.assignee}}</a>
+            </div>
+            <div class="row">
+                Reporter: {{ticket.reporter}}
+            </div>
+            <div class="row">
+                Due Date: {{ticket.due_date}}
+            </div>
+            <div class="row">
+                Time Estimated: {{ticket.time_estimated}}
+            </div>
+            <div class="row">
+                <a data-toggle="modal" data-target="#updateRemainingTimeModal">Time Remaining: {{ticket.time_remaining}}</a>
+            </div>
+            <div class="row">
+                <a data-toggle="modal" data-target="#updateLoggedTimeModal">Time Logged: {{ticket.time_logged}}</a>
+            </div>
+        </div>
+    </div>
 
-<body>
-<div align="center">
-    <p>Title: {{ticket.title}}</p>
-    <p>Description: {{ticket.description}}</p>
-    <p>Reporter: {{ticket.reporter}}</p>
-    <p>Status: {{ticket.status}}</p>
+    <!-- Modal -->
+    <div class="modal fade" id="updateStatusModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Update status</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form class="status" method="POST">
+            {% csrf_token %}
+            {{ forms.status.as_p }}
+
+            <button name='action' class="btn btn-primary" value='status' type="submit">Save</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="updateAssigneeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Update assignee</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form class="assignee" method="POST">
+            {% csrf_token %}
+            {{ forms.assignee.as_p }}
+
+            <button name='action' class="btn btn-primary" value='assignee' type="submit">Save</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="updateRemainingTimeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Remaining time</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form class="time_remaining" method="POST">
+            {% csrf_token %}
+            {{ forms.time_remaining.as_p }}
+
+            <button name='action' class="btn btn-primary" value='time_remaining' type="submit">Save</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="updateLoggedTimeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Log time</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form class="time_logged" method="POST">
+            {% csrf_token %}
+            {{ forms.time_logged.as_p }}
+
+            <button name='action' class="btn btn-primary" value='time_logged' type="submit">Save</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
 </div>
-</body>
+{% endblock %}
