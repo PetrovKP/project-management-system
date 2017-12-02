@@ -3,14 +3,6 @@ from django.contrib.auth.models import User
 
 from .forms import TicketForm, TicketAssigneeFormManager, ProjectDevelopersForm, TicketStatusForm
 from .models import Project, Ticket, TicketStatus
-from selenium import webdriver
-
-class TestFirefox(TestCase):
-    def setUp(self):
-        self.driver = webdriver.Firefox()
-
-    def test_m(self):
-        self.driver.get('http://127.0.0.1:8000/')
 
 
 #  Тестирования администратора
