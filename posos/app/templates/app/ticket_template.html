@@ -1,4 +1,4 @@
-{% extends "./base.html" %}
+{% extends "base.html" %}
 {% block content %}
 <div class="container">
     <div class="row">
@@ -67,12 +67,19 @@
             </button>
           </div>
           <div class="modal-body">
-            <form class="assignee" method="POST">
-            {% csrf_token %}
-            {{ forms.assignee.as_p }}
-
-            <button name='action' class="btn btn-primary" value='assignee' type="submit">Save</button>
+          {% if user in project.manager.all %}
+            <form class="assignee_manager" method="POST">
+                {% csrf_token %}
+                {{ forms.assignee_manager.as_p }}
+                <button name='action' class="btn btn-primary" value='assignee_manager' type="submit">Save</button>
             </form>
+          {% else %}
+            <form class="assignee_user" method="POST">
+                {% csrf_token %}
+                {{ forms.assignee_user.as_p }}
+                <button name='action' class="btn btn-primary" value='assignee_user' type="submit">Save</button>
+            </form>
+          {% endif %}
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@ from django.forms import ModelForm, DateInput, ModelChoiceField
 from .models import Ticket, Project
 
 
-class DateInputt(DateInput):
+class DateInputFixedField(DateInput):
     input_type = 'date'
 
 
@@ -12,7 +12,7 @@ class TicketForm(ModelForm):
         model = Ticket
         fields = ['title', 'description', 'assignee', 'status', 'due_date', 'time_estimated']
         widgets = {
-            'due_date': DateInputt(),
+            'due_date': DateInputFixedField(),
         }
 
 
@@ -34,15 +34,29 @@ class TicketStatusForm(ModelForm):
         fields = ['status']
 
 
-class TicketAssigneeForm(ModelForm):
+class TicketAssigneeFormManager(ModelForm):
     class Meta:
         model = Ticket
         fields = ['assignee']
 
     def __init__(self, *args, **kwargs):
         project_id = kwargs.pop('project_id')
-        super(TicketAssigneeForm, self).__init__(*args, **kwargs)
+        super(TicketAssigneeFormManager, self).__init__(*args, **kwargs)
         developers = Project.objects.get(id=project_id).developers
+        developers_forms = ModelChoiceField(queryset=developers)
+        self.fields['assignee'] = developers_forms
+
+
+class TicketAssigneeFormDeveloper(ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['assignee']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user')
+        project_id = kwargs.pop('project_id')
+        super(TicketAssigneeFormDeveloper, self).__init__(*args, **kwargs)
+        developers = Project.objects.get(id=project_id).developers.filter(username=user)
         developers_forms = ModelChoiceField(queryset=developers)
         self.fields['assignee'] = developers_forms
 
