@@ -1,8 +1,16 @@
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import User
 
 from .forms import TicketForm, TicketAssigneeFormManager, ProjectDevelopersForm, TicketStatusForm
 from .models import Project, Ticket, TicketStatus
+from selenium import webdriver
+
+class TestFirefox(TestCase):
+    def setUp(self):
+        self.driver = webdriver.Firefox()
+
+    def test_m(self):
+        self.driver.get('http://127.0.0.1:8000/')
 
 
 #  Тестирования администратора
@@ -48,7 +56,7 @@ class MenegerTest(TestCase):
 
 
     def setUp(self):
-        pass
+        self.factory = RequestFactory()
 
     def test_can_login(self):
         """Проверка на возможность авторизироваться в систему"""
@@ -71,9 +79,11 @@ class MenegerTest(TestCase):
 
     def test_can_create_ticket(self):
         """Проверка на возможность создать тикет"""
-        form_ticket_data = {'title':'addtests', 'description': 'impl',
+        user = User.objects.filter(username="executor1")
+
+        form_ticket_data = {'title':'addtests', 'assignee': user, 'description': 'impl',
                             'due_date' : '2017-12-20', 'time_estimated': 2}
-        form_ticket = TicketForm(data=form_ticket_data)
+        form_ticket = TicketForm(project_id=1, data=form_ticket_data)
 
         self.assertTrue(form_ticket.is_valid())
 
@@ -83,41 +93,49 @@ class MenegerTest(TestCase):
 
     def test_cant_create_ticket_format_data(self):
         """Проверка на отсутствие возможности создать тикет из-за неправильного ввода даты"""
-        form_ticket_data = {'title':'addtests', 'description': 'impl',
+        user = User.objects.filter(username="executor1")
+        form_ticket_data = {'title':'addtests', 'assignee': user, 'description': 'impl',
                             'due_date' : 'dwed/d', 'time_estimated': 2}
-        form_ticket = TicketForm(data=form_ticket_data)
+        form_ticket = TicketForm(project_id=1, data=form_ticket_data)
         self.assertFalse(form_ticket.is_valid())
 
     def test_cant_create_ticket_format_time_estimated(self):
         """Проверка на отсутствие возможности создать тикет из-за неправильного ввода оценочного времени"""
-        form_ticket_data = {'title': 'addtests', 'description': 'impl',
+        user = User.objects.filter(username="executor1")
+        form_ticket_data = {'title': 'addtests', 'assignee': user, 'description': 'impl',
                             'due_date': '2017-12-20', 'time_estimated': 'efwef'}
-        form_ticket = TicketForm(data=form_ticket_data)
+        form_ticket = TicketForm(project_id=1, data=form_ticket_data)
         self.assertFalse(form_ticket.is_valid())
 
     def test_cant_create_ticket_format_long_title(self):
         """Проверка на отсутствие возможности создать тикет из-за нарушения ограничения по размеру загаловка"""
-        form_ticket_data = {'title': 'addtests111111111111111111111111111111111111111111111111111111111111111'
-                                     '11111111111111111111111111111111111111111111111111111111111111111111111'
-                                     '11111111111111111111111111111111111111111111111111111111111111111111111'
-                                     '11111111111111111111111111111111111111111111111111111111111111111111111'
-                                     , 'description': 'impl',
-                            'due_date': '2017-12-20', 'time_estimated': '3'}
-        form_ticket = TicketForm(data=form_ticket_data)
+        user = User.objects.filter(username="executor1")
+        form_ticket_data = {'title': 'addtests'*100, 'description': 'impl',
+                            'due_date': '2017-12-20', 'assignee': user, 'time_estimated': '3'}
+        form_ticket = TicketForm(project_id=1, data=form_ticket_data)
         self.assertFalse(form_ticket.is_valid())
 
     def test_cant_create_ticket_empty_title(self):
-        """Проверка на отсутствие возможности создать тикет из-за нарушения ограничения по размеру загаловка"""
+        """Проверка на отсутствие возможности создать тикет из-за отсутствия загаловка"""
+        user = User.objects.filter(username="executor1")
         form_ticket_data = {'description': 'impl',
+                            'due_date': '2017-12-20', 'assignee': user, 'time_estimated': '3'}
+        form_ticket = TicketForm(project_id=1, data=form_ticket_data)
+        self.assertFalse(form_ticket.is_valid())
+
+    def test_cant_create_ticket_empty_user(self):
+        """Проверка на отсутствие возможности создать тикет из-за отсутствия исполнителя"""
+        form_ticket_data = {'title': 'addtests', 'description': 'impl',
                             'due_date': '2017-12-20', 'time_estimated': '3'}
-        form_ticket = TicketForm(data=form_ticket_data)
+        form_ticket = TicketForm(project_id=1, data=form_ticket_data)
         self.assertFalse(form_ticket.is_valid())
 
     def test_can_change_executor(self):
         """Проверка на возможность смены исполнителя в задаче"""
-        form_ticket_data = {'title':'addtests', 'description': 'impl',
+        user = User.objects.filter(username="executor1")
+        form_ticket_data = {'title':'addtests', 'assignee': user, 'description': 'impl',
                             'due_date' : '2017-12-20', 'time_estimated': 2}
-        form_ticket = TicketForm(data=form_ticket_data)
+        form_ticket = TicketForm(project_id=1, data=form_ticket_data)
 
         self.assertTrue(form_ticket.is_valid())
         response = self.client.post('/project/1', form_ticket.cleaned_data, follow=True)
@@ -137,9 +155,12 @@ class MenegerTest(TestCase):
 
     def test_cant_change_executor_not_projects(self):
         """Проверка на отсутствие возможности смены испонителя в задаче из-за отсутвия пользователя в проекте"""
-        form_ticket_data = {'title':'addtests', 'description': 'impl',
+        user = User.objects.filter(username="executor1")
+        form_ticket_data = {'title':'addtests', 'assignee': user, 'description': 'impl',
                             'due_date' : '2017-12-20', 'time_estimated': 2}
-        form_ticket = TicketForm(data=form_ticket_data)
+        form_ticket = TicketForm(project_id=1, data=form_ticket_data)
+        print(form_ticket.is_valid())
+        print(form_ticket.cleaned_data)
 
         self.assertTrue(form_ticket.is_valid())
         response = self.client.post('/project/1', form_ticket.cleaned_data, follow=True)
@@ -163,6 +184,7 @@ class MenegerTest(TestCase):
         response = self.client.get('/project/1', follow=True)
         self.assertEqual(response.status_code, 200)
         #self.assertTemplateUsed(response, "app/ticket_template.html")
+
         user_executor_new = User.objects.create_user(username="executor3", password="password1")
         user_executor_new.save()
         user = User.objects.filter(username="executor3")
@@ -217,12 +239,39 @@ class MenegerTest(TestCase):
 
     def test_can_change_task_status(self):
         """Проверка на возможность изменения статуса задачи"""
-
-        form_ticket_data = {'title':'addtests', 'description': 'impl',
+        user = User.objects.filter(username="executor1")
+        form_ticket_data = {'title':'addtests', 'assignee': user, 'description': 'impl',
                             'due_date' : '2017-12-20', 'time_estimated': 2}
-        form_ticket = TicketForm(data=form_ticket_data)
+        form_ticket = TicketForm(project_id=1, data=form_ticket_data)
 
         self.assertTrue(form_ticket.is_valid())
+        response = self.client.post('/project/1', form_ticket.cleaned_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/project/1/ticket/1', follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        status = TicketStatus.objects.create(title="DO")
+        status.save()
+        status = TicketStatus.objects.filter(title="DO")
+
+        form_status_data = {'status': status}
+        form_status = TicketStatusForm(data=form_status_data)
+
+        self.assertTrue(form_status.is_valid())
+
+        response = self.client.post('/project/1', form_status.cleaned_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_can_change_task_status2(self):
+        """Проверка на возможность изменения статуса задачи"""
+        user = User.objects.filter(username="executor1")
+        form_ticket_data = {'title': 'addtests', 'assignee': user, 'description': 'impl',
+                            'due_date': '2017-12-20', 'time_estimated': 2}
+        form_ticket = TicketForm(project_id=1, data=form_ticket_data)
+
+        self.assertTrue(form_ticket.is_valid())
+        request = self.factory.get('/project/1')
         response = self.client.post('/project/1', form_ticket.cleaned_data, follow=True)
         self.assertEqual(response.status_code, 200)
 
