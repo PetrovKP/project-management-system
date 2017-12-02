@@ -43,6 +43,12 @@ class ProjectView(AccessToProjectMixin, MultiFormsView):
                     'developers': ProjectDevelopersForm}
     success_url = '/'
 
+    def get_form_kwargs(self, form_name, bind_form=False):
+        kw = super(ProjectView, self).get_form_kwargs(form_name, bind_form=False)
+        if form_name == 'ticket':
+            kw['project_id'] = self.kwargs['project_id']
+        return kw
+
     def get_status_initial(self):
         return {'status': Project.objects.get(id=self.kwargs['project_id']).get_status()}
 
