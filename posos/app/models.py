@@ -69,7 +69,7 @@ class TicketManager(models.Manager):
         ticket = Ticket.objects.get(id=ticket_id)
         ticket.time_logged = ticket.time_logged + time_logged
         ticket.time_remaining = ticket.time_remaining - time_logged \
-                if ticket.time_remaining > time_logged else 0
+            if ticket.time_remaining > time_logged else 0
         ticket.save()
 
 
