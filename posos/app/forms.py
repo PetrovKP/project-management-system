@@ -15,13 +15,6 @@ class TicketForm(ModelForm):
             'due_date': DateInputFixedField(),
         }
 
-    def __init__(self, *args, **kwargs):
-        project_id = kwargs.pop('project_id')
-        super(TicketForm, self).__init__(*args, **kwargs)
-        developers = Project.objects.get(id=project_id).developers
-        developers_forms = ModelChoiceField(queryset=developers)
-        self.fields['assignee'] = developers_forms
-
 
 class ProjectStatusForm(ModelForm):
     class Meta:
