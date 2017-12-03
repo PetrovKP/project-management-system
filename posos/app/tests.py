@@ -255,41 +255,22 @@ class MenegerTest(TestCase):
         response = self.client.post('/project/1', form_status.cleaned_data, follow=True)
         self.assertEqual(response.status_code, 200)
 
-    def test_can_change_task_status2(self):
-        """Проверка на возможность изменения статуса задачи"""
-        user = User.objects.filter(username="executor1")
-        form_ticket_data = {'title': 'addtests', 'assignee': user, 'description': 'impl',
-                            'due_date': '2017-12-20', 'time_estimated': 2}
-        form_ticket = TicketForm(project_id=1, data=form_ticket_data)
-
-        self.assertTrue(form_ticket.is_valid())
-        request = self.factory.get('/project/1')
-        response = self.client.post('/project/1', form_ticket.cleaned_data, follow=True)
-        self.assertEqual(response.status_code, 200)
-
-        response = self.client.get('/project/1/ticket/1', follow=True)
-        self.assertEqual(response.status_code, 200)
-
-        status = TicketStatus.objects.create(title="DO")
-        status.save()
-        status = TicketStatus.objects.filter(title="DO")
-
-        form_status_data = {'status': status}
-        form_status = TicketStatusForm(data=form_status_data)
-
-        self.assertTrue(form_status.is_valid())
-
-        response = self.client.post('/project/1', form_status.cleaned_data, follow=True)
-        self.assertEqual(response.status_code, 200)
-
-
 #  Тестирование исполнителей
 class ExecutorTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = User.objects.create_user(username="executor1", password="password1")
-        #cls.project = Project.objects.create()
-       # cls.ticket = Ticket.objects.save_ticket('sdaa', 'dwdwdwda, )
+        cls.user_manager = User.objects.create_user(username="manager1", password="password1")
+        cls.user_manager.save()
+        cls.user_executor1 = User.objects.create_user(username="executor1", password="password1")
+        cls.user_executor1.save()
+
+        cls.user_executor2 = User.objects.create_user(username="executor2", password="password2")
+        cls.project = Project.objects.create(id=1, title='project', description='efwfefwe', status_id=0, due_date="2017-12-23")
+        cls.project.save()
+
+        cls.project.manager.add(cls.user_manager)
+        cls.project.developers.add(cls.user_executor1)
+        cls.project.developers.add(cls.user_executor2)
 
     def setUp(self):
         # self.project = Project.
@@ -301,23 +282,6 @@ class ExecutorTest(TestCase):
 
         response = self.client.get('/', follow=True)
 
-        self.assertEqual(response.status_code, 200)
         self.assertTrue(isLogin)
-
-    def test_cant_login(self):
-        """Проверка на отказ авторизироваться в систему, в случае неверного пароля"""
-        isLogin = self.client.login(username="executor1", password="passwerrsdfa")
-
-        response = self.client.get('/', follow=True)
-
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(isLogin)
-
-    def test_can_create_ticket(self):
-        """Проверка на возможность создать тикет"""
-        response = self.client.post('/', {'title':'add tests', 'description': 'impl',
-                                          'assignee' : 'kirill', 'status' : '',
-                                          'due_date' : 'tr', 'time_estimated': 'erge'})
-
-        #self.assertEqual(response.status_code, 200)
-
+        self.assertTemplateUsed(response, "app/all_projects_template.html")

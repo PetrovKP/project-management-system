@@ -3,5 +3,6 @@ source = posos/app
 branch = True
 omit =
     posos/app/migrations/*
+    posos/app/view/*
     posos/posos/*
     posos/manage.py
