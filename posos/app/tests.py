@@ -1,36 +1,12 @@
 from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import User
 
-from .forms import TicketForm, TicketAssigneeFormManager, ProjectDevelopersForm, TicketStatusForm
-from .models import Project, Ticket, TicketStatus
+from .forms import TicketForm, TicketAssigneeFormManager, ProjectDevelopersForm, TicketStatusForm, ProjectStatusForm
+from .models import Project, TicketStatus, ProjectStatus
 
 
-#  Тестирования администратора
-class AdminTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.superuser = User.objects.create_superuser(username="admin", password="password", email='vasya@mail.ru')
-    def setUp(self):
-        self.client.login(username="admin", password="password")
-    def tearDown(self):
-        self.client.logout()
-
-    def test_can_create_project(self):
-        """Проверка на возможность создать проект"""
-        response = self.client.post('/admin/app/project/add/', {'title' : 'hsrth',
-                                                                'description': 'jtyj',
-                                                                'manager':'thr',
-                                                                'status':'hrt',
-                                                                'created_date':'12.11.2017',
-                                                                'due_date':'15.11.2017'})
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get('/admin/app/project/')
-        print(response)
-        self.assertEqual(response.status_code, 200)
-
-
-#  Тестирования менеджера
-class MenegerTest(TestCase):
+#  Тестирование логики работы менеджера
+class ManagerTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user_manager = User.objects.create_user(username="manager1", password="password1")
@@ -38,14 +14,15 @@ class MenegerTest(TestCase):
         cls.user_executor1 = User.objects.create_user(username="executor1", password="password1")
         cls.user_executor1.save()
 
-        cls.user_executor2 = User.objects.create_user(username="executor2", password="password2")
-        cls.project = Project.objects.create(id=1, title='project', description='efwfefwe', status_id=0, due_date="2017-12-23")
+        cls.project = Project.objects.create(id=1,
+                                             title='project',
+                                             description='efwfefwe',
+                                             status_id=0,
+                                             due_date="2017-12-23")
         cls.project.save()
 
         cls.project.manager.add(cls.user_manager)
         cls.project.developers.add(cls.user_executor1)
-        cls.project.developers.add(cls.user_executor2)
-
 
     def setUp(self):
         self.factory = RequestFactory()
@@ -84,7 +61,7 @@ class MenegerTest(TestCase):
         #self.assertTemplateUsed(response, "app/creation_ticket_template.html")
 
     def test_cant_create_ticket_format_data(self):
-        """Проверка на отсутствие возможности создать тикет из-за неправильного ввода даты"""
+        """Проверка на отсутствие возможности создать тикет из-за неправильной даты"""
         user = User.objects.filter(username="executor1")
         form_ticket_data = {'title':'addtests', 'assignee': user, 'description': 'impl',
                             'due_date' : 'dwed/d', 'time_estimated': 2}
@@ -146,13 +123,11 @@ class MenegerTest(TestCase):
         #self.assertTemplateUsed(response, "app/creation_ticket_template.html")
 
     def test_cant_change_executor_not_projects(self):
-        """Проверка на отсутствие возможности смены испонителя в задаче из-за отсутвия пользователя в проекте"""
+        """Проверка на отсутствие возможности смены исполнителя в задаче из-за отсутвия пользователя в проекте"""
         user = User.objects.filter(username="executor1")
         form_ticket_data = {'title':'addtests', 'assignee': user, 'description': 'impl',
                             'due_date' : '2017-12-20', 'time_estimated': 2}
         form_ticket = TicketForm(project_id=1, data=form_ticket_data)
-        print(form_ticket.is_valid())
-        print(form_ticket.cleaned_data)
 
         self.assertTrue(form_ticket.is_valid())
         response = self.client.post('/project/1', form_ticket.cleaned_data, follow=True)
@@ -170,7 +145,7 @@ class MenegerTest(TestCase):
 
         self.assertFalse(form_assignee.is_valid())
 
-    def test_can_added_executor_in_project(self):
+    def test_can_add_executor_in_project(self):
         """Проверка на возможность добавления исполнителя в проект"""
 
         response = self.client.get('/project/1', follow=True)
@@ -188,12 +163,10 @@ class MenegerTest(TestCase):
         response = self.client.post('/project/1', form_develops.cleaned_data, follow=True)
         self.assertEqual(response.status_code, 200)
 
-    def test_can_added_executor_in_project_myself_project(self):
-        """Проверка на отсутсвие ошибок при добавления исполнителя в проект, когда он уже есть"""
-
+    def test_can_add_executor_in_project_myself_project(self):
+        """Проверка на отсутствие ошибок при добавлении исполнителя в проект, когда он уже есть"""
         response = self.client.get('/project/1', follow=True)
         self.assertEqual(response.status_code, 200)
-        # self.assertTemplateUsed(response, "app/ticket_template.html")
         user = User.objects.filter(username="executor1")
         form_develops_data = {'developers': user}
         form_develops = ProjectDevelopersForm(data=form_develops_data)
@@ -205,10 +178,8 @@ class MenegerTest(TestCase):
 
     def test_can_remove_executor_in_project(self):
         """Проверка на возможность удаление исполнителя из проекта"""
-
         response = self.client.get('/project/1', follow=True)
         self.assertEqual(response.status_code, 200)
-        # self.assertTemplateUsed(response, "app/ticket_template.html")
         user_executor_new = User.objects.create_user(username="executor3", password="password1")
         user_executor_new.save()
         user = User.objects.filter(username="executor3")
@@ -230,6 +201,24 @@ class MenegerTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_can_change_task_status(self):
+        """Проверка на возможность изменения статуса проекта"""
+        response = self.client.get('/project/1', follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        status = ProjectStatus.objects.create(title="DO")
+        status.save()
+        status = ProjectStatus.objects.filter(title="DO")
+
+        form_status_data = {'status': status}
+        form_status = ProjectStatusForm(data=form_status_data)
+
+        self.assertTrue(form_status.is_valid())
+
+        response = self.client.post('/project/1', form_status.cleaned_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+
+    def test_can_change_projects_status(self):
         """Проверка на возможность изменения статуса задачи"""
         user = User.objects.filter(username="executor1")
         form_ticket_data = {'title':'addtests', 'assignee': user, 'description': 'impl',
@@ -255,33 +244,113 @@ class MenegerTest(TestCase):
         response = self.client.post('/project/1', form_status.cleaned_data, follow=True)
         self.assertEqual(response.status_code, 200)
 
-#  Тестирование исполнителей
+
+#  Тестирование логики работы исполнителя
 class ExecutorTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user_manager = User.objects.create_user(username="manager1", password="password1")
         cls.user_manager.save()
-        cls.user_executor1 = User.objects.create_user(username="executor1", password="password1")
-        cls.user_executor1.save()
-
-        cls.user_executor2 = User.objects.create_user(username="executor2", password="password2")
-        cls.project = Project.objects.create(id=1, title='project', description='efwfefwe', status_id=0, due_date="2017-12-23")
+        cls.user_executor = User.objects.create_user(username="executor", password="password1")
+        cls.user_executor.save()
+        cls.project = Project.objects.create(id=1,
+                                             title='project',
+                                             description='efwfefwe',
+                                             status_id=0,
+                                             due_date="2017-12-23")
         cls.project.save()
 
         cls.project.manager.add(cls.user_manager)
-        cls.project.developers.add(cls.user_executor1)
-        cls.project.developers.add(cls.user_executor2)
+        cls.project.developers.add(cls.user_executor)
 
-    def setUp(self):
-        # self.project = Project.
-        pass
 
     def test_can_login(self):
         """Проверка на возможность авторизироваться в систему"""
-        isLogin = self.client.login(username="executor1", password="password1")
+        isLogin = self.client.login(username="executor", password="password1")
 
         response = self.client.get('/', follow=True)
 
         self.assertTrue(isLogin)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "app/all_projects_template.html")
+
+    def test_cant_login(self):
+        """Проверка на отказ авторизироваться в систему, в случае неверного пароля"""
+        isLogin = self.client.login(username="executor1", password="passwerrsdfa")
+
+        response = self.client.get('/', follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(isLogin)
+
+    def test_can_appoint_myself(self):
+        """Проверка на возможность назначения задачи на себя"""
+        user = User.objects.filter(username="executor")
+        form_ticket_data = {'title':'addtests', 'assignee':user, 'description': 'impl',
+                            'due_date' : '2017-12-20', 'time_estimated': 2}
+        form_ticket = TicketForm(project_id=1, data=form_ticket_data)
+
+        self.assertTrue(form_ticket.is_valid())
+        self.client.post('/project/1', form_ticket.cleaned_data, follow=True)
+
+        form_assignee_data = {'assignee': user}
+        form_assignee = TicketAssigneeFormManager(project_id=1, data=form_assignee_data)
+
+        self.assertTrue(form_assignee.is_valid())
+
+        response = self.client.post('/project/1/ticket/1', form_assignee.cleaned_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_cant_appoint_myself(self):
+        """Проверка на отсутствие возможности назначения задачи на других"""
+        user = User.objects.filter(username="executor_ref")
+        form_ticket_data = {'title':'addtests', 'assignee':user, 'description': 'impl',
+                            'due_date' : '2017-12-20', 'time_estimated': 2}
+        form_ticket = TicketForm(project_id=1, data=form_ticket_data)
+
+        self.assertFalse(form_ticket.is_valid())
+
+    def test_can_change_task_status(self):
+        """Проверка на возможность сменить статус задачи"""
+        user = User.objects.filter(username="executor")
+        form_ticket_data = {'title':'addtests', 'assignee': user, 'description': 'impl',
+                            'due_date' : '2017-12-20', 'time_estimated': 2}
+        form_ticket = TicketForm(project_id=1, data=form_ticket_data)
+
+        self.assertTrue(form_ticket.is_valid())
+        response = self.client.post('/project/1', form_ticket.cleaned_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/project/1/ticket/1', follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        status = TicketStatus.objects.create(title="DO")
+        status.save()
+        status = TicketStatus.objects.filter(title="DO")
+
+        form_status_data = {'status': status}
+        form_status = TicketStatusForm(data=form_status_data)
+
+        self.assertTrue(form_status.is_valid())
+
+        response = self.client.post('/project/1', form_status.cleaned_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_can_set_task_execution_time(self):
+        """Проверка на возможность установить время выполнения задачи"""
+        user = User.objects.filter(username="executor")
+        form_ticket_data = {'title':'addtests', 'assignee': user, 'description': 'impl',
+                            'due_date' : '2017-12-20', 'time_estimated': 2}
+        form_ticket = TicketForm(project_id=1, data=form_ticket_data)
+        self.assertTrue(form_ticket.is_valid())
+        response = self.client.post('/project/1', form_ticket.cleaned_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get('/project/1/ticket/1', follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        form_logger_data = {'time_logged': 10}
+        form_logger = TicketStatusForm(data=form_logger_data)
+
+        self.assertTrue(form_logger.is_valid())
+
+        response = self.client.post('/project/1/ticket/1', form_logger.cleaned_data, follow=True)
+        self.assertEqual(response.status_code, 200)
