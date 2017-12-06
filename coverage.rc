@@ -4,5 +4,6 @@ branch = True
 omit =
     posos/app/migrations/*
     posos/app/view/*
+    posos/app/views.py
     posos/posos/*
     posos/manage.py
