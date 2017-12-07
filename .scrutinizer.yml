@@ -22,3 +22,7 @@ build:
     tests:
         override:
             - command: pycodestyle --max-line-length=119 --exclude=*migrations* ./posos/app
+            - command: coverage run manage.py test app
+              coverage:
+                    file: '.coverage'
+                    format: 'py-cc'
